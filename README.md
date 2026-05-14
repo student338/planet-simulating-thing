@@ -6,6 +6,17 @@ An interactive, educational Three.js simulation of our solar system — designed
 
 ---
 
+## 📸 Screenshots
+
+| | |
+|---|---|
+| ![Solar System Explorer main view](screenshots/main-view.png) | ![Solar Eclipse Show](screenshots/solar-eclipse.png) |
+| *Main view — the full solar system in 3D* | *Solar Eclipse Show guided demonstration* |
+| ![Space Quiz](screenshots/quiz.png) | ![Add a Planet](screenshots/add-planet.png) |
+| *Space Quiz with instant feedback* | *Add your own planet with a custom name and colour* |
+
+---
+
 ## ✨ Features
 
 | Feature | Description |

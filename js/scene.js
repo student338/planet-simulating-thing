@@ -94,10 +94,6 @@ export class SceneManager {
     this.css2dRenderer.setSize(w, h);
   }
 
-// ── Easing helper ─────────────────────────────────────────────────────────────
-function easeInOutQuad(t) {
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-}
   follow(body) {
     this._followTarget = body;
   }
@@ -165,4 +161,9 @@ function easeInOutQuad(t) {
     const hits = this.raycaster.intersectObjects(meshes, false);
     return hits.length > 0 ? hits[0].object : null;
   }
+}
+
+// ── Easing helper ─────────────────────────────────────────────────────────────
+function easeInOutQuad(t) {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
