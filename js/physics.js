@@ -75,7 +75,7 @@ export function integrateNBody(bodies, dt) {
       const dist = Math.sqrt(dist2);
 
       // Softening to avoid singularity when bodies get very close
-      const softDist = Math.max(dist, 1.5);
+      const softDist = Math.max(dist, SOFTENING);
       const factor = G / (softDist * softDist * softDist);
 
       const ax = dx * factor;
@@ -95,7 +95,9 @@ export function integrateNBody(bodies, dt) {
     }
   }
 
-  // Leapfrog-style integrate (simple Euler for now)
+// Softening distance: prevents force singularities when two bodies occupy
+// nearly the same position (clamps the effective separation to at least this value).
+const SOFTENING = 1.5;
   for (let i = 0; i < n; i++) {
     if (bodies[i].fixed) continue;
     bodies[i].velocity.addScaledVector(acc[i], dt);

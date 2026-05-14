@@ -94,7 +94,10 @@ export class SceneManager {
     this.css2dRenderer.setSize(w, h);
   }
 
-  /** Follow a body with the camera (soft-lock). */
+// ── Easing helper ─────────────────────────────────────────────────────────────
+function easeInOutQuad(t) {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
   follow(body) {
     this._followTarget = body;
   }
@@ -116,7 +119,7 @@ export class SceneManager {
     const startTime = performance.now();
     const animate   = (now) => {
       const t   = Math.min((now - startTime) / duration, 1);
-      const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in-out quad
+      const ease = easeInOutQuad(t);
 
       this.camera.position.lerpVectors(startPos, endPos, ease);
       this.controls.target.lerpVectors(startLookAt, endLookAt, ease);

@@ -162,7 +162,10 @@ export class EclipseMode {
       targetPos    = moon.position.clone();
     }
 
-    const shadowLen  = casterPos.distanceTo(targetPos) * 2.2;
+    const shadowLen = casterPos.distanceTo(targetPos) * 2.2;
+    // Shadow cylinder approximating an umbra cone:
+    // slightly wider at the caster end, narrower at the target end.
+    // Open-ended (last arg = true) so the caps don't obscure body meshes.
     const geo = new THREE.CylinderGeometry(casterRadius * 0.8, casterRadius * 1.4, shadowLen, 32, 1, true);
     const mat = new THREE.MeshBasicMaterial({
       color:       0x000015,
