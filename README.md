@@ -36,16 +36,28 @@ An interactive, educational Three.js simulation of our solar system — designed
 
 ## 🚀 Running the App
 
-Because the app uses **ES modules** (`import`/`export`) and loads Three.js from a CDN, it **must be served over HTTP** — you cannot open `index.html` directly as a `file://` URL.
+The app uses a **build process** (esbuild) to bundle Three.js and all assets into a single self-contained `index.html`. 
 
-### Option A – GitHub Pages (recommended)
+### Quick start
 
-Push this repository to GitHub and enable **Pages → main branch / root**.  
-The simulation will be live at `https://<your-username>.github.io/<repo-name>/`.
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### Option B – Local development server
+2. **Build:**
+   ```bash
+   npm run build
+   ```
+   This creates a production `index.html` that works via `file://` or HTTP.
 
-Any static file server works:
+3. **Run:**
+   - **Desktop:** Open the generated `index.html` directly in your browser (no server needed!)
+   - **GitHub Pages (recommended):** Push to GitHub and enable **Pages → main branch / root**. The simulation will be live at `https://<your-username>.github.io/<repo-name>/`.
+
+### Development (optional)
+
+If you want to edit the source code and test locally without rebuilding every time, use a dev server with the source files:
 
 ```bash
 # Python 3
@@ -55,10 +67,10 @@ python -m http.server 8080
 npx serve .
 
 # VS Code
-# Install the "Live Server" extension, then right-click index.html → "Open with Live Server"
+# Install the "Live Server" extension, then right-click src/index.html → "Open with Live Server"
 ```
 
-Then open `http://localhost:8080` in your browser.
+Then open `http://localhost:8080/src/` in your browser. The app will load Three.js from the CDN using the importmap for instant editing feedback.
 
 ---
 
@@ -118,7 +130,8 @@ js/
 
 ## 🛠️ Tech Stack
 
-- **[Three.js r158](https://threejs.org/)** — 3D rendering (loaded from CDN, no build step)
+- **[Three.js r158](https://threejs.org/)** — 3D rendering (bundled locally via esbuild, no CDN dependency)
+- **[esbuild](https://esbuild.github.io/)** — Build tool to bundle Three.js and source code into a production-ready `index.html`
 - **CSS2DRenderer** — HTML labels anchored in 3D space
 - **OrbitControls** — mouse/touch camera navigation
-- Vanilla ES modules — no bundler required
+- Vanilla ES modules — easy development and modular code
