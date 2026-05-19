@@ -3,8 +3,9 @@
 import * as esbuild from 'esbuild';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const ROOT = new URL('.', import.meta.url).pathname;
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
 
 // ── 1. Bundle JS with esbuild ─────────────────────────────────────────────────
 const result = await esbuild.build({
@@ -25,9 +26,11 @@ const css = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 // ── 3. Read HTML template ─────────────────────────────────────────────────────
 let html = fs.readFileSync(path.join(ROOT, 'src/index.html'), 'utf8');
 
-// ── 4. Remove the importmap block ─────────────────────────────────────────────
+// ── 4. Remove the importmap block (and its preceding comment) ────────────────
+// The template keeps the importmap for editor tooling / dev-server use; the
+// build strips it entirely since three.js is bundled into the script below.
 html = html.replace(
-  /[ \t]*<!-- Three\.js import map[\s\S]*?<\/script>\n?/,
+  /[ \t]*<!-- NOTE: The importmap[\s\S]*?<\/script>\n?/,
   '',
 );
 
