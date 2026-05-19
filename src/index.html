@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌌 Solar System Explorer!</title>
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Three.js import map (ES-module style, no build step needed) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":          "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+      "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- ── Three.js canvas ─────────────────────────────────────────────────── -->
+  <canvas id="solar-canvas"></canvas>
+
+  <!-- ── Mobile panel toggle ─────────────────────────────────────────────── -->
+  <button id="panel-toggle" aria-label="Toggle controls panel">☰</button>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       MAIN CONTROL PANEL (left sidebar)
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="control-panel">
+    <div class="panel-header">
+      <h1>🌌 Solar System<br>Explorer!</h1>
+      <p class="panel-subtitle">Drag to spin · Scroll to zoom · Click planets!</p>
+    </div>
+
+    <!-- Speed ─────────────────────────────────────────────────────────────── -->
+    <section class="panel-section">
+      <h3>⏩ How Fast?</h3>
+      <div class="speed-row">
+        <span title="Slow">🐌</span>
+        <input type="range" id="speed-slider" min="0" max="5" step="0.05" value="1" />
+        <span title="Very fast">🚀</span>
+      </div>
+      <div id="speed-display" class="value-display">Normal speed 🌍</div>
+      <button id="pause-btn" class="btn btn-secondary">⏸️ Pause</button>
+    </section>
+
+    <!-- Show / Hide ────────────────────────────────────────────────────────── -->
+    <section class="panel-section">
+      <h3>👁️ Show / Hide</h3>
+      <label class="toggle-row">
+        <input type="checkbox" id="toggle-orbits" checked />
+        <span>Orbit paths 🔵</span>
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" id="toggle-labels" checked />
+        <span>Planet names 🏷️</span>
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" id="toggle-trails" />
+        <span>Movement trails ✨</span>
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" id="toggle-gravity" />
+        <span>Real gravity mode ⚡</span>
+      </label>
+    </section>
+
+    <!-- Add bodies ─────────────────────────────────────────────────────────── -->
+    <section class="panel-section">
+      <h3>➕ Add Space Things!</h3>
+      <button class="btn btn-add" id="add-planet-btn">🪐 Add a Planet</button>
+      <button class="btn btn-add" id="add-moon-btn">🌙 Add a Moon</button>
+      <button class="btn btn-add" id="add-star-btn">⭐ Add a Star</button>
+      <button class="btn btn-add" id="add-asteroid-btn">☄️ Add an Asteroid</button>
+    </section>
+
+    <!-- Eclipse ──────────────────────────────────────────────────────────────── -->
+    <section class="panel-section">
+      <h3>🎓 Learn About Space!</h3>
+      <button class="btn btn-eclipse" id="solar-eclipse-btn">☀️ Solar Eclipse Show!</button>
+      <button class="btn btn-eclipse" id="lunar-eclipse-btn">🌙 Lunar Eclipse Show!</button>
+    </section>
+
+    <!-- Quiz ──────────────────────────────────────────────────────────────────── -->
+    <section class="panel-section">
+      <button class="btn btn-quiz" id="quiz-btn">🧠 Take a Space Quiz!</button>
+    </section>
+
+    <!-- Reset ─────────────────────────────────────────────────────────────────── -->
+    <section class="panel-section">
+      <button class="btn btn-danger" id="reset-btn">🔄 Reset Everything</button>
+    </section>
+  </div><!-- /#control-panel -->
+
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       BODY INFO PANEL (click on any planet/moon/sun)
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="info-panel" class="hidden" data-body-id="">
+    <button id="info-close" class="close-btn" aria-label="Close info">✕</button>
+    <div id="info-emoji-display">🌍</div>
+    <h2 id="info-name">Earth</h2>
+    <p id="info-description"></p>
+    <div id="info-fact-box" class="fact-box">
+      <strong>Fun Fact! 🌟</strong>
+      <p id="info-fun-fact"></p>
+    </div>
+    <button id="info-follow-btn" class="btn btn-secondary">📷 Follow this body</button>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       ADD BODY MODAL
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="add-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="close-btn" id="add-modal-close" aria-label="Close">✕</button>
+      <h2 id="add-modal-title">➕ Add a Planet 🪐</h2>
+
+      <div class="form-group">
+        <label for="add-name">What's its name?</label>
+        <input type="text" id="add-name" placeholder="Planet X" maxlength="20" />
+      </div>
+
+      <div class="form-group">
+        <label>Pick a colour!</label>
+        <div id="color-picker-row" role="group" aria-label="Colour picker"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="add-size">How big?
+          <span id="size-display" class="slider-label">Medium 🌍</span>
+        </label>
+        <input type="range" id="add-size" min="1" max="5" step="1" value="3" />
+      </div>
+
+      <div class="form-group" id="orbit-group">
+        <label for="add-orbit">How far from the Sun?
+          <span id="orbit-display" class="slider-label">Medium 🌍</span>
+        </label>
+        <input type="range" id="add-orbit" min="1" max="5" step="1" value="3" />
+      </div>
+
+      <button class="btn btn-add" id="add-confirm-btn">✨ Add it!</button>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       ECLIPSE OVERLAY
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="eclipse-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="eclipse-card modal-card">
+      <button class="close-btn" id="eclipse-close" aria-label="Close eclipse">✕</button>
+
+      <div id="eclipse-type-badge" class="eclipse-badge">☀️ Solar Eclipse</div>
+      <h2 id="eclipse-title">What is a Solar Eclipse?</h2>
+      <div id="eclipse-step-indicator" class="step-indicator">Step 1 of 3</div>
+      <div id="eclipse-explanation" class="eclipse-text"></div>
+
+      <div id="eclipse-fact-box" class="fact-box hidden">
+        <strong>Did you know? 🌟</strong>
+        <p id="eclipse-fact"></p>
+      </div>
+
+      <div class="eclipse-nav">
+        <button class="btn btn-secondary" id="eclipse-prev-btn" disabled>◀ Previous</button>
+        <button class="btn btn-primary"   id="eclipse-next-btn">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       QUIZ OVERLAY
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="quiz-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="quiz-card modal-card">
+      <button class="close-btn" id="quiz-close" aria-label="Close quiz">✕</button>
+
+      <div class="quiz-header">
+        <h2>🧠 Space Quiz!</h2>
+        <div class="quiz-score-row">
+          <span id="quiz-stars"></span>
+          <span id="quiz-score-text">Score: 0/5</span>
+        </div>
+      </div>
+
+      <div id="quiz-question-num" class="question-num">Question 1 of 5</div>
+      <div id="quiz-question-text" class="quiz-question"></div>
+      <div id="quiz-options"       class="quiz-options"></div>
+      <div id="quiz-feedback"      class="quiz-feedback hidden"></div>
+      <button class="btn btn-primary hidden" id="quiz-next-btn">Next Question ▶</button>
+    </div>
+  </div>
+
+  <!-- Quiz complete screen ──────────────────────────────────────────────────── -->
+  <div id="quiz-complete" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="quiz-card modal-card">
+      <h2 id="quiz-complete-title">🎉 Quiz Complete!</h2>
+      <div id="quiz-final-stars" class="final-stars"></div>
+      <p  id="quiz-final-message"></p>
+      <p  id="quiz-final-score"   class="final-score"></p>
+      <button class="btn btn-quiz"      id="quiz-again-btn">🔄 Try Again!</button>
+      <button class="btn btn-secondary" id="quiz-done-btn">🚀 Back to Space!</button>
+    </div>
+  </div>
+
+  <!-- Quiz notification toast ──────────────────────────────────────────────── -->
+  <div id="quiz-toast" class="toast hidden" role="alert">
+    <div class="toast-content">
+      <p>🧠 You've been exploring for a while!<br>Want to test your space knowledge?</p>
+      <div class="toast-buttons">
+        <button class="btn btn-quiz"      id="toast-yes-btn">Yes! Let's go! 🚀</button>
+        <button class="btn btn-secondary" id="toast-no-btn">Not now 😴</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
