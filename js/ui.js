@@ -125,6 +125,32 @@ export class UIManager {
     document.getElementById('solar-canvas').addEventListener('click', e => {
       this._onCanvasClick(e);
     });
+
+    // Fly mode
+    const flyBtn  = document.getElementById('fly-mode-btn');
+    const flyHint = document.getElementById('fly-mode-hint');
+    this._flyActive = false;
+
+    flyBtn.addEventListener('click', () => {
+      if (!this._flyActive) {
+        this._flyActive = true;
+        flyBtn.textContent = '🛸 Exit Fly Mode';
+        flyHint.classList.remove('hidden');
+        this.sceneMgr.enableFlyMode();
+      } else {
+        this._flyActive = false;
+        flyBtn.textContent = '🛸 Fly Around!';
+        flyHint.classList.add('hidden');
+        this.sceneMgr.disableFlyMode();
+      }
+    });
+
+    // Listen for external fly-mode exit (e.g. user pressed Escape to release pointer lock)
+    document.getElementById('solar-canvas').addEventListener('flymode-exit', () => {
+      this._flyActive = false;
+      flyBtn.textContent = '🛸 Fly Around!';
+      flyHint.classList.add('hidden');
+    });
   }
 
   // ── Speed display ─────────────────────────────────────────────────────────

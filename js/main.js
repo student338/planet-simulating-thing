@@ -72,7 +72,7 @@ function animate(now) {
     }
   }
 
-  sceneMgr.render();
+  sceneMgr.render(wallDt);
 }
 
 requestAnimationFrame(animate);

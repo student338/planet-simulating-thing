@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { OrbitControls }   from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer }   from 'three/addons/renderers/CSS2DRenderer.js';
+import { FlyControls }     from './flycontrols.js';
 
 export class SceneManager {
   constructor(canvasEl) {
@@ -66,6 +67,9 @@ export class SceneManager {
 
     // ── Target body for camera follow ────────────────────────────────────────
     this._followTarget = null;
+
+    // ── Fly-around controls ──────────────────────────────────────────────────
+    this.flyControls = new FlyControls(this.camera, canvasEl);
   }
 
   _buildStarfield() {
@@ -138,10 +142,32 @@ export class SceneManager {
     }, 1200);
   }
 
-  /** Render one frame. */
-  render() {
+  /** Enable fly-around mode (disables orbit controls). */
+  enableFlyMode() {
+    this.controls.enabled = false;
+    this._followTarget = null;
+    this.flyControls.activate();
+  }
+
+  /** Disable fly-around mode (re-enables orbit controls). */
+  disableFlyMode() {
+    this.flyControls.deactivate();
+    // Re-sync orbit controls target to where the camera is looking
+    const lookDir = new THREE.Vector3();
+    this.camera.getWorldDirection(lookDir);
+    this.controls.target.copy(this.camera.position).addScaledVector(lookDir, 100);
+    this.controls.enabled = true;
+  }
+
+  /** Render one frame. @param {number} [deltaSec] wall-clock seconds since last frame */
+  render(deltaSec = 0.016) {
+    // Fly mode movement
+    if (this.flyControls.enabled) {
+      this.flyControls.update(deltaSec);
+    }
+
     // Camera follow
-    if (this._followTarget) {
+    if (this._followTarget && !this.flyControls.enabled) {
       const tp = this._followTarget.position;
       this.controls.target.lerp(tp, 0.08);
     }
