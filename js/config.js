@@ -507,12 +507,10 @@ export const SOLAR_SYSTEM_MODES = [
   {
     id: 'solar',
     name: '☀️ Our Solar System',
-    bodies: 'SOLAR_BODIES',
   },
   {
     id: 'alpha-centauri',
     name: '⭐ Alpha Centauri',
-    bodies: 'ALPHA_CENTAURI_BODIES',
   },
 ];
 
