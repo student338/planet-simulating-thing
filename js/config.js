@@ -36,6 +36,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 0,
     period: 0,
     parent: null,
+    textureStyle: 'star',
     description:
       "I'm the Sun! 🌞 I'm a GIANT ball of super-hot gas called plasma. " +
       "I'm so BIG that more than one million Earths could fit inside me! " +
@@ -53,6 +54,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 38,
     period: 0.241,
     parent: 'sun',
+    textureStyle: 'barren',
     description:
       "Hi, I'm Mercury! 🪨 I'm the smallest planet and the closest one to the Sun. " +
       "I zoom around the Sun in just 88 Earth days – super fast! " +
@@ -71,6 +73,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 58,
     period: 0.615,
     parent: 'sun',
+    textureStyle: 'rocky',
     description:
       "I'm Venus! 🌕 I'm the hottest planet even though Mercury is closer to the Sun. " +
       "My thick clouds trap heat like a blanket. I'm also called Earth's twin because " +
@@ -89,6 +92,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 80,
     period: 1.0,
     parent: 'sun',
+    textureStyle: 'earth',
     description:
       "That's home! 🌍 Earth is the only planet we know that has liquid water, " +
       "breathable air, and LIFE! I orbit the Sun once every 365 days – that's one year!",
@@ -105,6 +109,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 12,
     period: 0.0748,  // ~27.3 days
     parent: 'earth',
+    textureStyle: 'barren',
     description:
       "I'm the Moon! 🌙 I'm Earth's only natural satellite. " +
       "I orbit Earth once every 27 days. My gravity causes the ocean tides on Earth!",
@@ -122,6 +127,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 115,
     period: 1.881,
     parent: 'sun',
+    textureStyle: 'rocky',
     description:
       "I'm Mars! 🔴 People call me the Red Planet because my soil has lots of rust (iron oxide). " +
       "I have the tallest volcano in the solar system – Olympus Mons – three times taller than Mount Everest!",
@@ -138,6 +144,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 200,
     period: 11.86,
     parent: 'sun',
+    textureStyle: 'gas',
     description:
       "I'm Jupiter! 🪐 I'm the BIGGEST planet – all the other planets could fit inside me! " +
       "I'm a gas giant, meaning I don't have a solid surface. " +
@@ -156,6 +163,7 @@ export const SOLAR_BODIES = [
     period: 29.46,
     parent: 'sun',
     rings: true,
+    textureStyle: 'gas',
     description:
       "I'm Saturn! 🪐 I'm famous for my beautiful rings, made of billions of chunks " +
       "of ice and rock. I'm a gas giant and I'm so light that I would float on water!",
@@ -173,6 +181,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 360,
     period: 84.0,
     parent: 'sun',
+    textureStyle: 'ice',
     description:
       "I'm Uranus! 🔵 I'm an ice giant and I spin on my side – my axis is tilted so much " +
       "that I basically roll around the Sun! My seasons each last about 21 Earth years!",
@@ -189,6 +198,7 @@ export const SOLAR_BODIES = [
     orbitRadius: 440,
     period: 164.8,
     parent: 'sun',
+    textureStyle: 'ice',
     description:
       "I'm Neptune! 🌀 I'm the farthest planet from the Sun. " +
       "I have the strongest winds in the solar system – up to 2,100 km/h! " +
@@ -376,6 +386,135 @@ export const ECLIPSE_SCRIPTS = {
     },
   ],
 };
+
+// ── Alpha Centauri system ─────────────────────────────────────────────────────
+// A triple-star system with hypothetical planets around Alpha Centauri A & B,
+// and the confirmed Proxima Centauri b.
+export const ALPHA_CENTAURI_BODIES = [
+  {
+    id: 'alpha-cen-a',
+    name: 'Alpha Centauri A',
+    emoji: '☀️',
+    type: 'star',
+    radius: 13,
+    color: 0xFFF4E0,
+    emissive: 0xFFF4E0,
+    emissiveIntensity: 1.0,
+    mass: 366000,  // ~1.1 solar masses
+    fixed: true,
+    orbitRadius: 0,
+    period: 0,
+    parent: null,
+    textureStyle: 'star',
+    description:
+      "I'm Alpha Centauri A! ☀️ I'm the brightest star in the Alpha Centauri system " +
+      "and slightly larger and brighter than our Sun. I'm about 4.37 light-years from Earth!",
+    funFact: 'Alpha Centauri A is the 4th brightest star visible from Earth! ✨',
+  },
+  {
+    id: 'alpha-cen-b',
+    name: 'Alpha Centauri B',
+    emoji: '🌟',
+    type: 'star',
+    radius: 10,
+    color: 0xFFCC80,
+    emissive: 0xFFCC80,
+    emissiveIntensity: 0.9,
+    mass: 300000,  // ~0.9 solar masses
+    orbitRadius: 100,
+    period: 79.9,
+    parent: 'alpha-cen-a',
+    textureStyle: 'star',
+    description:
+      "I'm Alpha Centauri B! 🌟 I'm the smaller companion star, orbiting together with " +
+      "Alpha Centauri A. I'm an orange-ish star (spectral type K1V).",
+    funFact: 'Alpha Centauri A and B orbit each other every 79.9 years! They range from 11 to 36 AU apart. 🔄',
+  },
+  {
+    id: 'proxima',
+    name: 'Proxima Centauri',
+    emoji: '🔴',
+    type: 'star',
+    radius: 4,
+    color: 0xFF4422,
+    emissive: 0xFF4422,
+    emissiveIntensity: 0.7,
+    mass: 40000,  // ~0.12 solar masses
+    orbitRadius: 380,
+    period: 547000,  // ~547,000 years (very distant)
+    parent: 'alpha-cen-a',
+    textureStyle: 'star',
+    description:
+      "I'm Proxima Centauri! 🔴 I'm a tiny red dwarf star – the closest star to our Sun " +
+      "at just 4.24 light-years away. I'm much smaller and cooler than the Sun.",
+    funFact: 'Proxima Centauri is so dim that it was only discovered in 1915, even though it is our nearest stellar neighbour! 🔭',
+  },
+  {
+    id: 'proxima-b',
+    name: 'Proxima Centauri b',
+    emoji: '🌍',
+    type: 'planet',
+    radius: 3.0,
+    color: 0x5588AA,
+    mass: 1.3,
+    orbitRadius: 18,
+    period: 0.03,  // ~11.2 days
+    parent: 'proxima',
+    textureStyle: 'rocky',
+    description:
+      "I'm Proxima Centauri b! 🌍 I'm a rocky planet about 1.3 times the mass of Earth. " +
+      "I orbit in the habitable zone of Proxima Centauri – liquid water might exist on my surface!",
+    funFact: 'Proxima b was discovered in 2016 and is the closest known exoplanet to our solar system! 🚀',
+  },
+  {
+    id: 'proxima-d',
+    name: 'Proxima Centauri d',
+    emoji: '🪨',
+    type: 'planet',
+    radius: 1.5,
+    color: 0xAA8866,
+    mass: 0.26,
+    orbitRadius: 10,
+    period: 0.014,  // ~5.1 days
+    parent: 'proxima',
+    textureStyle: 'barren',
+    description:
+      "I'm Proxima Centauri d! 🪨 I'm one of the smallest exoplanets ever detected, " +
+      "only about a quarter of Earth's mass. I orbit very close to my star.",
+    funFact: 'Proxima d was confirmed in 2022 – it takes only 5 days to orbit its star! ⚡',
+  },
+  {
+    id: 'candidate-ab',
+    name: 'Cen A b (hypothetical)',
+    emoji: '🪐',
+    type: 'planet',
+    radius: 5.0,
+    color: 0xC9A96E,
+    mass: 50.0,
+    orbitRadius: 55,
+    period: 3.5,
+    parent: 'alpha-cen-a',
+    textureStyle: 'gas',
+    description:
+      "I'm a hypothetical gas giant that might orbit Alpha Centauri A! 🪐 " +
+      "Scientists are still searching for planets around the two main stars.",
+    funFact: 'Detecting planets in binary star systems is extra difficult because the two stars confuse instruments! 🔬',
+  },
+];
+
+// ── Solar system mode definitions ─────────────────────────────────────────────
+export const SOLAR_SYSTEM_MODES = [
+  {
+    id: 'solar',
+    name: '☀️ Our Solar System',
+    bodies: 'SOLAR_BODIES',
+  },
+  {
+    id: 'alpha-centauri',
+    name: '⭐ Alpha Centauri',
+    bodies: 'ALPHA_CENTAURI_BODIES',
+  },
+];
 
 // ── Preset colors for the add-body picker ──────────────────────────────────────
 export const BODY_COLORS = [

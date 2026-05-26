@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // ui.js – UI event handlers, info panel, add-body modal
 // ─────────────────────────────────────────────────────────────────────────────
-import { BODY_COLORS, SIZE_PRESETS, ORBIT_PRESETS } from './config.js';
+import { BODY_COLORS, SIZE_PRESETS, ORBIT_PRESETS, SOLAR_SYSTEM_MODES } from './config.js';
 import { circularOrbitVelocity } from './physics.js';
 import { isMoon } from './bodies.js';
 
@@ -13,12 +13,13 @@ export class UIManager {
    * @param {EclipseMode}   eclipseMgr
    * @param {QuizMode}      quizMgr
    */
-  constructor(sceneMgr, bodyMgr, simState, eclipseMgr, quizMgr) {
+  constructor(sceneMgr, bodyMgr, simState, eclipseMgr, quizMgr, switchSystem) {
     this.sceneMgr   = sceneMgr;
     this.bodyMgr    = bodyMgr;
     this.simState   = simState;
     this.eclipseMgr = eclipseMgr;
     this.quizMgr    = quizMgr;
+    this.switchSystem = switchSystem;
 
     this._addType          = 'planet';  // current add-modal type
     this._selectedColor    = BODY_COLORS[5];  // default blue
@@ -26,6 +27,7 @@ export class UIManager {
     this._bindAll();
     this._buildColorPicker();
     this._buildSpeedDisplay();
+    this._buildSystemSelector();
   }
 
   // ── Wire up all button/control events ────────────────────────────────────
@@ -166,6 +168,25 @@ export class UIManager {
     else if (ts < 4.0)   label = 'Very fast 🚀';
     else                 label = 'Turbo! ⚡';
     document.getElementById('speed-display').textContent = label;
+  }
+
+  // ── System selector ──────────────────────────────────────────────────────
+
+  _buildSystemSelector() {
+    const container = document.getElementById('system-selector');
+    if (!container) return;
+    SOLAR_SYSTEM_MODES.forEach((mode, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-system';
+      btn.textContent = mode.name;
+      if (i === 0) btn.classList.add('active');
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('.btn-system').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.switchSystem(mode.id);
+      });
+      container.appendChild(btn);
+    });
   }
 
   // ── Color picker ──────────────────────────────────────────────────────────

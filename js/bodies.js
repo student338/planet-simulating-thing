@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { keplerianOffset, advanceAngle, circularOrbitVelocity } from './physics.js';
+import { generatePlanetTexture, generateStarTexture } from './textures.js';
 
 /** Returns true if this body orbits a planet (i.e. is a moon), not the Sun directly. */
 export function isMoon(body) {
@@ -32,6 +33,7 @@ export class CelestialBody {
     this.description = cfg.description ?? '';
     this.funFact     = cfg.funFact     ?? '';
     this.isCustom    = cfg.isCustom    ?? false;
+    this.textureStyle = cfg.textureStyle ?? null;
 
     // Keplerian state – random start angle for variety
     this.angle = cfg.startAngle ?? Math.random() * Math.PI * 2;
@@ -60,12 +62,27 @@ export class CelestialBody {
   buildMesh(scene) {
     // Sphere
     const geo  = new THREE.SphereGeometry(this.radius, 32, 32);
+
+    // Generate procedural texture based on body type
+    let texture = null;
+    const seed = this.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    if (this.type === 'star') {
+      texture = generateStarTexture(this.color, seed);
+    } else if (this.textureStyle) {
+      texture = generatePlanetTexture({
+        baseColor: this.color,
+        style: this.textureStyle,
+        seed,
+      });
+    }
+
     const mat  = new THREE.MeshStandardMaterial({
       color:             this.color,
       emissive:          this.emissive,
       emissiveIntensity: this.emissiveIntensity,
       roughness:         this.type === 'star' ? 1 : 0.85,
       metalness:         0.05,
+      ...(texture ? { map: texture } : {}),
     });
     this.mesh  = new THREE.Mesh(geo, mat);
     this.mesh.castShadow    = true;
@@ -297,6 +314,14 @@ export class BodyManager {
     for (const [cid, child] of this.bodies) {
       if (child.parentId === id) this.remove(cid);
     }
+  }
+
+  /** Remove all bodies (used when switching solar system modes). */
+  clear() {
+    for (const body of this.bodies.values()) {
+      body.dispose(this.scene);
+    }
+    this.bodies.clear();
   }
 
   /** Generate a unique id for a custom body. */

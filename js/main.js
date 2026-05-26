@@ -1,13 +1,19 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // main.js – Entry point: initialise everything and run the animation loop
 // ─────────────────────────────────────────────────────────────────────────────
-import { SOLAR_BODIES, YEARS_PER_REAL_SECOND } from './config.js';
+import { SOLAR_BODIES, ALPHA_CENTAURI_BODIES, SOLAR_SYSTEM_MODES, YEARS_PER_REAL_SECOND } from './config.js';
 import { SceneManager }   from './scene.js';
 import { BodyManager, isMoon } from './bodies.js';
 import { integrateNBody } from './physics.js';
 import { EclipseMode }    from './eclipse.js';
 import { QuizMode }       from './quiz.js';
 import { UIManager }      from './ui.js';
+
+// ── Map of mode id → bodies array ────────────────────────────────────────────
+const SYSTEM_BODIES_MAP = {
+  'solar': SOLAR_BODIES,
+  'alpha-centauri': ALPHA_CENTAURI_BODIES,
+};
 
 // ── Simulation state ──────────────────────────────────────────────────────────
 const simState = {
@@ -33,10 +39,27 @@ for (const cfg of SOLAR_BODIES) {
 bodyMgr.setAllOrbits(true);
 bodyMgr.setAllLabels(true);
 
+// ── System switching function ─────────────────────────────────────────────────
+function switchSystem(modeId) {
+  const bodies = SYSTEM_BODIES_MAP[modeId];
+  if (!bodies) return;
+  bodyMgr.clear();
+  for (const cfg of bodies) {
+    bodyMgr.add(cfg);
+  }
+  bodyMgr.setAllOrbits(simState.showOrbits);
+  bodyMgr.setAllLabels(simState.showLabels);
+  bodyMgr.setAllTrails(simState.showTrails);
+  if (simState.useNBody) {
+    bodyMgr.initNBodyVelocities();
+  }
+  sceneMgr.stopFollowing();
+}
+
 // ── Special modes ─────────────────────────────────────────────────────────────
 const eclipseMgr = new EclipseMode(sceneMgr, bodyMgr, simState);
 const quizMgr    = new QuizMode(simState);
-const uiMgr      = new UIManager(sceneMgr, bodyMgr, simState, eclipseMgr, quizMgr);
+const uiMgr      = new UIManager(sceneMgr, bodyMgr, simState, eclipseMgr, quizMgr, switchSystem);
 
 // ── Animation loop ────────────────────────────────────────────────────────────
 let lastTime = performance.now();
