@@ -2,8 +2,11 @@
 // config.js – All static data: bodies, quiz questions, eclipse scripts
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Gravitational constant (simulation units, NOT SI)
-export const G = 0.0008;
+// Gravitational constant (simulation units, NOT SI).
+// Calibrated so that Earth (r=80, parent mass=333000) has an N-body orbital
+// period of 1 simulation year, matching the Keplerian period.
+// Derived from: G = 4π² · r³ / (T² · M)
+export const G = 4 * Math.PI * Math.PI * (80 ** 3) / (1 * 333000); // ≈ 60.7
 
 // Simulation years advanced per real second at 1× speed.
 // At 60 fps this gives ~0.004 years/frame → Earth year in ~4 real seconds.

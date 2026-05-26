@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { SOLAR_BODIES, YEARS_PER_REAL_SECOND } from './config.js';
 import { SceneManager }   from './scene.js';
-import { BodyManager }    from './bodies.js';
+import { BodyManager, isMoon } from './bodies.js';
 import { integrateNBody } from './physics.js';
 import { EclipseMode }    from './eclipse.js';
 import { QuizMode }       from './quiz.js';
@@ -55,7 +55,12 @@ function animate(now) {
       // (nBodyStates() returns references, not copies)
       integrateNBody(bodyMgr.nBodyStates(), dt);
       for (const body of bodyMgr.all()) {
-        body.updatePosition(dt, true);
+        if (isMoon(body)) {
+          // Moons use Keplerian orbit around their (N-body-updated) parent
+          body.updatePosition(dt, false);
+        } else {
+          body.updatePosition(dt, true);
+        }
       }
     } else {
       // Keplerian: advance each body's orbital angle
