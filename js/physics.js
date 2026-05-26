@@ -60,7 +60,7 @@ export function circularOrbitVelocity(pos, centralPos, centralMass) {
  */
 // Softening distance: prevents force singularities when two bodies occupy
 // nearly the same position (clamps the effective separation to at least this value).
-const SOFTENING = 1.5;
+const SOFTENING = 5.0;
 
 export function integrateNBody(bodies, dt) {
   const n = bodies.length;

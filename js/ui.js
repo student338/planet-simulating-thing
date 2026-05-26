@@ -323,15 +323,13 @@ export class UIManager {
     body.setLabelVisible(this.simState.showLabels);
 
     // If N-body mode is on, give the new body a circular orbital velocity
-    if (this.simState.useNBody) {
-      const parentBody = body.parent ?? this.bodyMgr.bodies.get('sun');
-      if (parentBody) {
+    // (moons are handled via Keplerian motion, so only planets/stars need this)
+    if (this.simState.useNBody && !(body.parentId && body.parentId !== 'sun')) {
+      const sun = this.bodyMgr.bodies.get('sun');
+      if (sun) {
         body.velocity.copy(
-          circularOrbitVelocity(body.position, parentBody.position, parentBody.mass)
+          circularOrbitVelocity(body.position, sun.position, sun.mass)
         );
-        if (body.parent && body.parent.id !== 'sun') {
-          body.velocity.add(body.parent.velocity);
-        }
       }
     }
 

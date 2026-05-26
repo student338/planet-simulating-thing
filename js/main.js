@@ -55,7 +55,12 @@ function animate(now) {
       // (nBodyStates() returns references, not copies)
       integrateNBody(bodyMgr.nBodyStates(), dt);
       for (const body of bodyMgr.all()) {
-        body.updatePosition(dt, true);
+        if (body.parentId && body.parentId !== 'sun') {
+          // Moons use Keplerian orbit around their (N-body-updated) parent
+          body.updatePosition(dt, false);
+        } else {
+          body.updatePosition(dt, true);
+        }
       }
     } else {
       // Keplerian: advance each body's orbital angle

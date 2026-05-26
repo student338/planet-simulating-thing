@@ -304,33 +304,34 @@ export class BodyManager {
     return Array.from(this.bodies.values());
   }
 
-  /** Return bodies used by the N-body engine (needs position/velocity/mass). */
+  /** Return bodies used by the N-body engine (needs position/velocity/mass).
+   *  Moons are excluded – they use hierarchical Keplerian motion around their parent. */
   nBodyStates() {
-    return this.all().map(b => ({
-      id:       b.id,
-      position: b.position,
-      velocity: b.velocity,
-      mass:     b.mass,
-      fixed:    b.fixed,
-    }));
+    return this.all()
+      .filter(b => !b.parentId || b.parentId === 'sun')
+      .map(b => ({
+        id:       b.id,
+        position: b.position,
+        velocity: b.velocity,
+        mass:     b.mass,
+        fixed:    b.fixed,
+      }));
   }
 
-  /** Initialise N-body velocities from current Keplerian positions. */
+  /** Initialise N-body velocities from current Keplerian positions.
+   *  Moons are skipped – they use hierarchical Keplerian motion. */
   initNBodyVelocities() {
     const sun = this.bodies.get('sun');
     if (!sun) return;
 
     for (const body of this.bodies.values()) {
       if (body.id === 'sun') continue;
-      // Determine the dominant attractor
-      const attractor = body.parent ?? sun;
+      // Skip moons – they orbit their parent via Keplerian motion
+      if (body.parentId && body.parentId !== 'sun') continue;
+
       body.velocity.copy(
-        circularOrbitVelocity(body.position, attractor.position, attractor.mass)
+        circularOrbitVelocity(body.position, sun.position, sun.mass)
       );
-      // If orbiting a planet (moon), add parent's velocity
-      if (body.parent && body.parent.id !== 'sun') {
-        body.velocity.add(body.parent.velocity);
-      }
     }
   }
 
