@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { BODY_COLORS, SIZE_PRESETS, ORBIT_PRESETS } from './config.js';
 import { circularOrbitVelocity } from './physics.js';
+import { isMoon } from './bodies.js';
 
 export class UIManager {
   /**
@@ -324,7 +325,7 @@ export class UIManager {
 
     // If N-body mode is on, give the new body a circular orbital velocity
     // (moons are handled via Keplerian motion, so only planets/stars need this)
-    if (this.simState.useNBody && !(body.parentId && body.parentId !== 'sun')) {
+    if (this.simState.useNBody && !isMoon(body)) {
       const sun = this.bodyMgr.bodies.get('sun');
       if (sun) {
         body.velocity.copy(

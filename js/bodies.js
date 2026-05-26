@@ -5,6 +5,11 @@ import * as THREE from 'three';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { keplerianOffset, advanceAngle, circularOrbitVelocity } from './physics.js';
 
+/** Returns true if this body orbits a planet (i.e. is a moon), not the Sun directly. */
+export function isMoon(body) {
+  return !!(body.parentId && body.parentId !== 'sun');
+}
+
 // ── CelestialBody ─────────────────────────────────────────────────────────────
 export class CelestialBody {
   /**
@@ -308,7 +313,7 @@ export class BodyManager {
    *  Moons are excluded – they use hierarchical Keplerian motion around their parent. */
   nBodyStates() {
     return this.all()
-      .filter(b => !b.parentId || b.parentId === 'sun')
+      .filter(b => !isMoon(b))
       .map(b => ({
         id:       b.id,
         position: b.position,
@@ -327,7 +332,7 @@ export class BodyManager {
     for (const body of this.bodies.values()) {
       if (body.id === 'sun') continue;
       // Skip moons – they orbit their parent via Keplerian motion
-      if (body.parentId && body.parentId !== 'sun') continue;
+      if (isMoon(body)) continue;
 
       body.velocity.copy(
         circularOrbitVelocity(body.position, sun.position, sun.mass)
