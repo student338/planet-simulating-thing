@@ -513,6 +513,30 @@ input[type="range"]::-moz-range-thumb {
 .toast-buttons { display: flex; gap: 10px; justify-content: center; }
 .toast-buttons .btn { width: auto; padding: 9px 18px; }
 
+/* ── System selector ─────────────────────────────────────────────────────────── */
+.system-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.btn-system {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  background: rgba(255,255,255,0.04);
+  color: var(--text-dim);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn-system:hover { background: rgba(91,156,246,0.1); border-color: var(--accent); color: var(--text); }
+.btn-system.active { background: rgba(91,156,246,0.18); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 8px rgba(91,156,246,0.25); }
+
 /* ── Utility ─────────────────────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 
