@@ -77,7 +77,7 @@ export class CelestialBody {
     }
 
     const mat  = new THREE.MeshStandardMaterial({
-      color:             this.color,
+      color:             texture ? 0xffffff : this.color,
       emissive:          this.emissive,
       emissiveIntensity: this.emissiveIntensity,
       roughness:         this.type === 'star' ? 1 : 0.85,
