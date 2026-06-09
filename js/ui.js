@@ -134,21 +134,60 @@ export class UIManager {
     const flyHint = document.getElementById('fly-mode-hint');
     this._flyActive = false;
 
-    flyBtn.addEventListener('click', () => {
-      if (!this._flyActive) {
-        this._flyActive = true;
-        flyBtn.textContent = '🛸 Exit Fly Mode';
-        flyHint.classList.remove('hidden');
-        this.sceneMgr.enableFlyMode();
-      } else {
+    // Touch support for Fly Mode
+    if ('ontouchstart' in window) {
+      const exitFlyBtn = document.createElement('button');
+      exitFlyBtn.id = 'fly-exit-touch';
+      exitFlyBtn.className = 'btn btn-danger';
+      exitFlyBtn.textContent = '❌ Exit Fly';
+      exitFlyBtn.style.cssText = 'position:absolute; top:20px; right:20px; z-index:100; display:none;';
+      document.body.appendChild(exitFlyBtn);
+
+      exitFlyBtn.addEventListener('click', () => {
+        this.sceneMgr.disableFlyMode();
         this._flyActive = false;
         flyBtn.textContent = '🛸 Fly Around!';
         flyHint.classList.add('hidden');
-        this.sceneMgr.disableFlyMode();
-      }
-    });
+        exitFlyBtn.style.display = 'none';
+      });
 
-    // Listen for external fly-mode exit (e.g. user pressed Escape to release pointer lock)
+      const updateFlyBtnVisibility = () => {
+        exitFlyBtn.style.display = this._flyActive ? 'block' : 'none';
+      };
+
+      const originalFlyBtnHandler = () => {
+        if (!this._flyActive) {
+          this._flyActive = true;
+          flyBtn.textContent = '🛸 Exit Fly Mode';
+          flyHint.classList.remove('hidden');
+          this.sceneMgr.enableFlyMode();
+          updateFlyBtnVisibility();
+        } else {
+          this._flyActive = false;
+          flyBtn.textContent = '🛸 Fly Around!';
+          flyHint.classList.add('hidden');
+          this.sceneMgr.disableFlyMode();
+          updateFlyBtnVisibility();
+        }
+      };
+      flyBtn.replaceWith(flyBtn.cloneNode(true));
+      document.getElementById('fly-mode-btn').addEventListener('click', originalFlyBtnHandler);
+    } else {
+      flyBtn.addEventListener('click', () => {
+        if (!this._flyActive) {
+          this._flyActive = true;
+          flyBtn.textContent = '🛸 Exit Fly Mode';
+          flyHint.classList.remove('hidden');
+          this.sceneMgr.enableFlyMode();
+        } else {
+          this._flyActive = false;
+          flyBtn.textContent = '🛸 Fly Around!';
+          flyHint.classList.add('hidden');
+          this.sceneMgr.disableFlyMode();
+        }
+      });
+    }
+
     document.getElementById('solar-canvas').addEventListener('flymode-exit', () => {
       this._flyActive = false;
       flyBtn.textContent = '🛸 Fly Around!';
@@ -220,16 +259,13 @@ export class UIManager {
     };
     document.getElementById('add-modal-title').textContent = labels[type] ?? '➕ Add a Body';
 
-    // Show/hide orbit slider (moons orbit Earth, not the Sun)
     const orbitGroup = document.getElementById('orbit-group');
     orbitGroup.style.display = type === 'moon' ? 'none' : '';
 
-    // Show/hide size slider (asteroids are always tiny)
     const sizeSlider = document.getElementById('add-size');
     if (type === 'asteroid') { sizeSlider.value = 1; sizeSlider.disabled = true; }
     else                     { sizeSlider.disabled = false; }
 
-    // Default name
     const defaultNames = {
       planet:   'Planet X',
       moon:     'Mini Moon',
@@ -238,7 +274,6 @@ export class UIManager {
     };
     document.getElementById('add-name').value = defaultNames[type] ?? '';
 
-    // Star warning
     let warn = document.getElementById('star-warn');
     if (!warn) {
       warn = document.createElement('p');
@@ -319,7 +354,6 @@ export class UIManager {
         funFact:     'Most asteroids live in the Asteroid Belt between Mars and Jupiter! ☄️',
       };
     } else {
-      // Planet
       const orbitR = ORBIT_PRESETS[orbitI]?.radius ?? 170;
       cfg = {
         id,
@@ -330,7 +364,7 @@ export class UIManager {
         color,
         mass:        0.5 * radius * radius,
         orbitRadius: orbitR,
-        period:      Math.pow(orbitR / 80, 1.5), // Kepler's 3rd law (approx)
+        period:      Math.pow(orbitR / 80, 1.5),
         parent:      'sun',
         isCustom:    true,
         description: `${name} is a planet you added! 🪐`,
@@ -339,13 +373,9 @@ export class UIManager {
     }
 
     const body = this.bodyMgr.add(cfg);
-
-    // Apply current visibility settings
     body.setOrbitVisible(this.simState.showOrbits);
     body.setLabelVisible(this.simState.showLabels);
 
-    // If N-body mode is on, give the new body a circular orbital velocity
-    // (moons are handled via Keplerian motion, so only planets/stars need this)
     if (this.simState.useNBody && !isMoon(body)) {
       const sun = this.bodyMgr.bodies.get('sun');
       if (sun) {
@@ -357,8 +387,6 @@ export class UIManager {
 
     this._closeAddModal();
   }
-
-  // ── Info panel ────────────────────────────────────────────────────────────
 
   showBodyInfo(body) {
     document.getElementById('info-panel').dataset.bodyId = body.id;
@@ -374,10 +402,7 @@ export class UIManager {
     this.sceneMgr.stopFollowing();
   }
 
-  // ── Canvas click → pick body ──────────────────────────────────────────────
-
   _onCanvasClick(e) {
-    // Ignore clicks on UI elements
     if (e.target !== document.getElementById('solar-canvas')) return;
 
     const meshes = this.bodyMgr.all().map(b => b.mesh).filter(Boolean);
