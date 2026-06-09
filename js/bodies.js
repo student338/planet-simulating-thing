@@ -274,6 +274,7 @@ export class CelestialBody {
     if (this.mesh)      { this.mesh.geometry.dispose(); scene.remove(this.mesh); }
     if (this.orbitLine) { this.orbitLine.geometry.dispose(); scene.remove(this.orbitLine); }
     if (this.trailLine) { this.trailLine.geometry.dispose(); scene.remove(this.trailLine); }
+    if (this.label)     { this.label.element.remove(); scene.remove(this.label); }
     if (this.light)     scene.remove(this.light);
   }
 }
