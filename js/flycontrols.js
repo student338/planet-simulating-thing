@@ -34,8 +34,11 @@ export class FlyControls {
     this._euler = new THREE.Euler(0, 0, 0, 'YXZ');
 
     // Speed (scene units per second)
-    this.moveSpeed      = 120;
+    this.moveSpeed      = 300; // Increased from 120 for better feel
     this.lookSensitivity = 0.002;
+
+    // Touch la-sensitivity (higher for touch devices)
+    this.touchLookSensitivity = 0.01; 
 
     // Touch state
     this._touchIdMove = null;
@@ -227,8 +230,8 @@ export class FlyControls {
         const moveY = touch.clientY - this._touchLookStart.y;
         
         this._euler.setFromQuaternion(this.camera.quaternion);
-        this._euler.y -= moveX * this.lookSensitivity * 5; // Multiplier for touch feel
-        this._euler.x -= moveY * this.lookSensitivity * 5;
+        this._euler.y -= moveX * this.touchLookSensitivity;
+        this._euler.x -= moveY * this.touchLookSensitivity;
         this._euler.x = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, this._euler.x));
         this.camera.quaternion.setFromEuler(this._euler);
         
